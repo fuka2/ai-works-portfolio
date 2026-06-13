@@ -9,9 +9,15 @@
   <meta property="og:description" content="AIで、アイデアを動くものに変える。" />
   <meta property="og:type" content="website" />
   <meta property="og:image" content="課題１スクショ.jpg" />
+  <!-- セキュリティ: CSP でインラインスクリプト以外の外部リソースを制限 -->
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; script-src 'self' 'unsafe-inline';" />
+  <!-- X-Frame-Options の代替（meta は参考値。本番は HTTPヘッダで設定） -->
+  <meta http-equiv="X-Content-Type-Options" content="nosniff" />
+  <!-- パフォーマンス: フォントを preload して FOIT を防ぐ -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&display=swap&font-display=swap" rel="stylesheet" />
   <style>
     /* ============================================================
        男塾デザイン訓令書 準拠
@@ -385,9 +391,10 @@
       <span></span><span></span><span></span>
     </button>
   </nav>
-  <div class="nav-drawer" id="drawer">
-    <a href="#about" onclick="closeDrawer()">About</a>
-    <a href="#works" onclick="closeDrawer()">Works</a>
+  <!-- セキュリティ: onclick インラインハンドラを排除。JS側でaddEventListenerを使用 -->
+  <div class="nav-drawer" id="drawer" role="navigation" aria-label="モバイルメニュー">
+    <a href="#about" data-drawer-close>About</a>
+    <a href="#works" data-drawer-close>Works</a>
   </div>
 
   <!-- ヒーロー -->
@@ -432,7 +439,9 @@
 
         <article class="card">
           <div class="card-thumb">
-            <img src="課題１スクショ.jpg" alt="Tetris Neon Edition" />
+            <!-- パフォーマンス: 1枚目はビューポート内に入りうるため eager + fetchpriority high -->
+            <img src="課題１スクショ.jpg" alt="Tetris Neon Edition"
+                 width="800" height="500" loading="eager" decoding="async" fetchpriority="high" />
           </div>
           <div class="card-body">
             <span class="card-badge">Web Game</span>
@@ -443,7 +452,8 @@
 
         <article class="card">
           <div class="card-thumb">
-            <img src="課題２スクショ.jpg" alt="LINE公式アカウントLP" />
+            <img src="課題２スクショ.jpg" alt="LINE公式アカウントLP"
+                 width="800" height="500" loading="lazy" decoding="async" />
           </div>
           <div class="card-body">
             <span class="card-badge">Landing Page</span>
@@ -454,7 +464,8 @@
 
         <article class="card">
           <div class="card-thumb">
-            <img class="mobile" src="課題３Screenshot_20260513-062140.png" alt="wakofukaNews Bot" />
+            <img class="mobile" src="課題３Screenshot_20260513-062140.png" alt="wakofukaNews Bot"
+                 width="400" height="622" loading="lazy" decoding="async" />
           </div>
           <div class="card-body">
             <span class="card-badge">LINE Bot</span>
@@ -465,7 +476,8 @@
 
         <article class="card">
           <div class="card-thumb">
-            <img class="mobile" src="課題４Screenshot_20260515-061649.png" alt="ポモドーロタイマー" />
+            <img class="mobile" src="課題４Screenshot_20260515-061649.png" alt="ポモドーロタイマー"
+                 width="400" height="890" loading="lazy" decoding="async" />
           </div>
           <div class="card-body">
             <span class="card-badge">Mobile App</span>
@@ -476,7 +488,8 @@
 
         <article class="card">
           <div class="card-thumb">
-            <img src="07_Claude in Chromeでブラウザを自動操作しよう【入門】上級課題０１.png" alt="住宅ローン金利比較表自動生成" />
+            <img src="07_Claude in Chromeでブラウザを自動操作しよう【入門】上級課題０１.png" alt="住宅ローン金利比較表自動生成"
+                 width="800" height="500" loading="lazy" decoding="async" />
           </div>
           <div class="card-body">
             <span class="card-badge">Browser Automation</span>
@@ -495,24 +508,82 @@
     <span class="footer-badge">Built with Claude</span>
   </footer>
 
-  <script>
-    // IntersectionObserver でカード入場アニメーション
-    const cards = document.querySelectorAll('.card');
-    const obs = new IntersectionObserver((entries) => {
-      entries.forEach(e => {
-        if (e.isIntersecting) {
-          e.target.classList.add('visible');
-          obs.unobserve(e.target);
+  <!--
+    可読性・セキュリティ:
+    - type="module" でスコープをモジュール内に閉じ込め、グローバル汚染を防止
+    - JSDoc で型を明示（TypeScript相当の型安全）
+    - 機能ごとに関数を分離（単一責任の原則）
+    - null チェックで実行時エラーを防止
+  -->
+  <script type="module">
+    /**
+     * カード入場アニメーション（単一責任: 表示トリガーのみ）
+     * @param {NodeListOf<Element>} cardElements
+     * @returns {void}
+     */
+    function initCardReveal(cardElements) {
+      /** @type {IntersectionObserverCallback} */
+      const onIntersect = (entries, observer) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+            observer.unobserve(entry.target);
+          }
+        });
+      };
+
+      const observer = new IntersectionObserver(onIntersect, { threshold: 0.12 });
+      cardElements.forEach((card) => observer.observe(card));
+    }
+
+    /**
+     * ハンバーガーメニューの開閉（単一責任: ドロワー制御のみ）
+     * @param {HTMLElement} toggleButton
+     * @param {HTMLElement} drawerElement
+     * @returns {void}
+     */
+    function initMobileNav(toggleButton, drawerElement) {
+      /** @returns {void} */
+      const openDrawer  = () => drawerElement.classList.add('open');
+      /** @returns {void} */
+      const closeDrawer = () => drawerElement.classList.remove('open');
+      /** @returns {void} */
+      const toggleDrawer = () =>
+        drawerElement.classList.contains('open') ? closeDrawer() : openDrawer();
+
+      toggleButton.addEventListener('click', toggleDrawer);
+
+      // data-drawer-close 属性を持つリンクはすべてドロワーを閉じる
+      drawerElement.querySelectorAll('[data-drawer-close]').forEach((link) => {
+        link.addEventListener('click', closeDrawer);
+      });
+
+      // ドロワー外クリックで閉じる
+      document.addEventListener('click', (event) => {
+        const target = /** @type {Node} */ (event.target);
+        if (!drawerElement.contains(target) && !toggleButton.contains(target)) {
+          closeDrawer();
         }
       });
-    }, { threshold: 0.12 });
-    cards.forEach(c => obs.observe(c));
+    }
 
-    // ハンバーガーメニュー
-    const hamburger = document.getElementById('hamburger');
-    const drawer = document.getElementById('drawer');
-    hamburger.addEventListener('click', () => drawer.classList.toggle('open'));
-    function closeDrawer() { drawer.classList.remove('open'); }
+    /** エントリーポイント */
+    function main() {
+      const cards = document.querySelectorAll('.card');
+      initCardReveal(cards);
+
+      /** @type {HTMLElement | null} */
+      const hamburgerEl = document.getElementById('hamburger');
+      /** @type {HTMLElement | null} */
+      const drawerEl    = document.getElementById('drawer');
+
+      // null チェック: 要素が存在する場合のみ初期化
+      if (hamburgerEl && drawerEl) {
+        initMobileNav(hamburgerEl, drawerEl);
+      }
+    }
+
+    main();
   </script>
 </body>
 </html>
