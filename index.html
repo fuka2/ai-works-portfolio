@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI Works Portfolio</title>
+  <meta name="description" content="Claude・Manus・LINE APIなどのAIツールを活用し、ゲーム・自動化・アプリ・Webサイトを実際に作った成果物の記録。" />
+  <meta property="og:title" content="AI Works Portfolio" />
+  <meta property="og:description" content="AIで、アイデアを動くものに変える。" />
+  <meta property="og:type" content="website" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    /* ============================================================
+       男塾デザイン訓令書 準拠
+    ============================================================ */
+    :root {
+      --crimson:    #8b0000;
+      --crimson-dk: #6b0000;
+      --bg-warm:    #f5f0e8;
+      --bg-muted:   #eeebe0;
+      --bg-white:   #ffffff;
+      --bg-black:   #1a1a1a;
+      --text-main:  #1a1a1a;
+      --text-sub:   #555555;
+      --text-inv:   #f5f0e8;
+      --gold:       #e8c87a;
+      --border-soft:#cccccc;
+    }
+
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: "游明朝", "Yu Mincho", "Noto Serif JP", serif;
+      background: var(--bg-warm);
+      color: var(--text-main);
+      line-height: 1.9;
+      overflow-x: hidden;
+    }
+
+    /* ── ナビゲーション ── */
+    nav {
+      position: sticky;
+      top: 0;
+      z-index: 200;
+      background: var(--bg-black);
+      border-bottom: 3px solid var(--crimson);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 48px;
+      height: 64px;
+    }
+    .nav-logo {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: .25em;
+      color: var(--text-inv);
+    }
+    nav ul { list-style: none; display: flex; gap: 2.5rem; }
+    nav ul a {
+      color: var(--text-inv);
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .12em;
+      transition: color .2s;
+    }
+    nav ul a:hover { color: var(--gold); }
+
+    /* ── ヒーロー ── */
+    #hero {
+      background: var(--bg-black);
+      border-bottom: 3px solid var(--crimson);
+      padding: 100px 48px 110px;
+    }
+    .hero-inner { max-width: 1200px; margin: 0 auto; }
+    .hero-eyebrow {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .3em;
+      color: var(--crimson);
+      text-transform: uppercase;
+      margin-bottom: 28px;
+    }
+    #hero h1 {
+      font-size: clamp(28px, 4vw, 42px);
+      font-weight: 700;
+      line-height: 1.6;
+      letter-spacing: .18em;
+      color: var(--text-inv);
+      margin-bottom: 24px;
+    }
+    #hero h1 em {
+      font-style: normal;
+      color: var(--gold);
+    }
+    .hero-rule {
+      width: 72px;
+      height: 4px;
+      background: var(--crimson);
+      margin-bottom: 28px;
+    }
+    #hero p {
+      font-size: 15px;
+      color: var(--text-inv);
+      opacity: .75;
+      max-width: 520px;
+      line-height: 2;
+      margin-bottom: 48px;
+    }
+    .btn-primary {
+      display: inline-block;
+      padding: 12px 32px;
+      background: var(--crimson);
+      color: var(--bg-warm);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: .12em;
+      border: 2px solid var(--crimson);
+      border-radius: 4px;
+      transition: background .2s, box-shadow .2s;
+    }
+    .btn-primary:hover {
+      background: var(--crimson-dk);
+      box-shadow: rgba(139,0,0,.5) 0 6px 20px;
+    }
+
+    /* ── セクション共通 ── */
+    .section-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 88px 48px;
+    }
+    .s-eyebrow {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .28em;
+      color: var(--crimson);
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+    .s-title {
+      font-size: clamp(20px, 2.5vw, 28px);
+      font-weight: 700;
+      letter-spacing: .12em;
+      color: var(--text-main);
+      line-height: 1.5;
+      margin-bottom: 16px;
+    }
+    .s-rule {
+      width: 64px;
+      height: 4px;
+      background: var(--crimson);
+      margin-bottom: 28px;
+    }
+    .s-sub {
+      font-size: 14px;
+      color: var(--text-sub);
+      line-height: 2;
+      max-width: 600px;
+      margin-bottom: 48px;
+    }
+
+    /* ── About ── */
+    #about {
+      background: var(--bg-white);
+      border-bottom: 1px solid var(--border-soft);
+    }
+    .tool-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .tool-badge {
+      padding: 5px 14px;
+      background: var(--bg-black);
+      color: var(--gold);
+      border: 1.5px solid var(--crimson);
+      border-radius: 3px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .1em;
+    }
+
+    /* ── Works ── */
+    #works {
+      background: var(--bg-warm);
+    }
+    .works-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 28px;
+    }
+
+    /* ── カード ── */
+    .card {
+      background: var(--bg-warm);
+      border: 2px solid var(--crimson);
+      border-radius: 4px;
+      overflow: hidden;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: opacity .35s ease, transform .35s ease, box-shadow .2s ease;
+    }
+    .card.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .card:hover {
+      box-shadow: rgba(139,0,0,.3) 0 6px 20px;
+      transform: translateY(-3px);
+    }
+    .card.visible:hover {
+      transform: translateY(-3px);
+    }
+
+    .card-thumb {
+      width: 100%;
+      overflow: hidden;
+      background: var(--bg-black);
+      border-bottom: 2px solid var(--crimson);
+    }
+    .card-thumb img {
+      width: 100%;
+      display: block;
+      border-radius: 0;
+      object-fit: cover;
+      object-position: top;
+      aspect-ratio: 16 / 10;
+      transition: transform .3s ease;
+    }
+    .card-thumb img.mobile {
+      aspect-ratio: 9 / 14;
+      object-position: center top;
+    }
+    .card:hover .card-thumb img {
+      transform: scale(1.03);
+    }
+
+    .card-body {
+      padding: 20px 22px 26px;
+    }
+    .card-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      background: var(--bg-black);
+      color: var(--gold);
+      border: 1.5px solid var(--crimson);
+      border-radius: 3px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .1em;
+      margin-bottom: 12px;
+    }
+    .card-title {
+      font-size: 17px;
+      font-weight: 700;
+      letter-spacing: .05em;
+      color: var(--text-main);
+      line-height: 1.5;
+      margin-bottom: 8px;
+    }
+    .card-desc {
+      font-size: 13px;
+      color: var(--text-sub);
+      line-height: 1.9;
+    }
+
+    /* ── フッター ── */
+    footer {
+      background: var(--bg-black);
+      border-top: 3px solid var(--crimson);
+      padding: 36px 48px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    footer p {
+      font-size: 12px;
+      color: var(--text-inv);
+      opacity: .6;
+      letter-spacing: .1em;
+    }
+    footer .footer-badge {
+      padding: 4px 14px;
+      background: transparent;
+      color: var(--gold);
+      border: 1.5px solid var(--crimson);
+      border-radius: 3px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: .1em;
+    }
+
+    /* ── スクロールアニメーション ── */
+    @keyframes strikein {
+      from { transform: scaleX(0); transform-origin: left; }
+      to   { transform: scaleX(1); transform-origin: left; }
+    }
+    .s-rule.animate, .hero-rule.animate {
+      animation: strikein .35s ease forwards;
+    }
+
+    /* ── カード遅延 ── */
+    .card:nth-child(1) { transition-delay: .05s; }
+    .card:nth-child(2) { transition-delay: .12s; }
+    .card:nth-child(3) { transition-delay: .19s; }
+    .card:nth-child(4) { transition-delay: .26s; }
+    .card:nth-child(5) { transition-delay: .33s; }
+
+    /* ── レスポンシブ ── */
+    @media (max-width: 960px) {
+      .works-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 640px) {
+      nav { padding: 0 20px; height: 56px; }
+      nav ul { display: none; }
+      #hero { padding: 64px 20px 72px; }
+      .section-inner { padding: 56px 20px; }
+      .works-grid { grid-template-columns: 1fr; }
+      footer { flex-direction: column; text-align: center; padding: 28px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ナビゲーション -->
+  <nav>
+    <span class="nav-logo">AI　WORKS</span>
+    <ul>
+      <li><a href="#about">About</a></li>
+      <li><a href="#works">Works</a></li>
+    </ul>
+  </nav>
+
+  <!-- ヒーロー -->
+  <section id="hero">
+    <div class="hero-inner">
+      <p class="hero-eyebrow">AI Development Portfolio</p>
+      <h1>AIで、アイデアを<br><em>動くものに変える</em></h1>
+      <div class="hero-rule"></div>
+      <p>Claude・Manus・LINE API などのAIツールを活用し、<br>
+         ゲーム・自動化・アプリ・Webサイトを実際に作った成果物の記録である。</p>
+      <a href="#works" class="btn-primary">制作実績を見よ</a>
+    </div>
+  </section>
+
+  <!-- About -->
+  <section id="about">
+    <div class="section-inner">
+      <p class="s-eyebrow">About</p>
+      <h2 class="s-title">使用したAIツール</h2>
+      <div class="s-rule"></div>
+      <p class="s-sub">プロンプトエンジニアリングを軸に、様々なAIツールを組み合わせ実際に動くプロダクトを制作した。</p>
+      <div class="tool-list">
+        <span class="tool-badge">Claude (Anthropic)</span>
+        <span class="tool-badge">Claude in Chrome</span>
+        <span class="tool-badge">Manus</span>
+        <span class="tool-badge">LINE Messaging API</span>
+        <span class="tool-badge">Browser Automation</span>
+        <span class="tool-badge">HTML / CSS / JavaScript</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Works -->
+  <section id="works">
+    <div class="section-inner">
+      <p class="s-eyebrow">Works</p>
+      <h2 class="s-title">制作実績</h2>
+      <div class="s-rule"></div>
+      <p class="s-sub">AIを活用して制作した五つのプロダクト。一作一作に全力を込めた。</p>
+
+      <div class="works-grid">
+
+        <article class="card">
+          <div class="card-thumb">
+            <img src="課題１スクショ.jpg" alt="Tetris Neon Edition" />
+          </div>
+          <div class="card-body">
+            <span class="card-badge">Web Game</span>
+            <h3 class="card-title">Tetris Neon Edition</h3>
+            <p class="card-desc">AIとのペアプログラミングで制作したブラウザ動作のテトリス。ホールド・ネクスト表示・スコアシステムを完備したネオンデザイン。</p>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-thumb">
+            <img src="課題２スクショ.jpg" alt="LINE公式アカウントLP" />
+          </div>
+          <div class="card-body">
+            <span class="card-badge">Landing Page</span>
+            <h3 class="card-title">LINE公式アカウント LP</h3>
+            <p class="card-desc">Manus を使って制作したホットコア向けランディングページ。友だち追加の導線と無料クーポン訴求をデザインに落とし込んだ。</p>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-thumb">
+            <img class="mobile" src="課題３Screenshot_20260513-062140.png" alt="wakofukaNews Bot" />
+          </div>
+          <div class="card-body">
+            <span class="card-badge">LINE Bot</span>
+            <h3 class="card-title">wakofukaNews Bot</h3>
+            <p class="card-desc">Yahoo!ニュースの最新5件を自動取得してLINEに配信するBotを構築。定時配信により情報収集を完全自動化した。</p>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-thumb">
+            <img class="mobile" src="課題４Screenshot_20260515-061649.png" alt="ポモドーロタイマー" />
+          </div>
+          <div class="card-body">
+            <span class="card-badge">Mobile App</span>
+            <h3 class="card-title">ポモドーロタイマー</h3>
+            <p class="card-desc">集中力を高めるポモドーロ・テクニックを実装したモバイルアプリ。セッション統計・スキップ・リセット機能を搭載。</p>
+          </div>
+        </article>
+
+        <article class="card">
+          <div class="card-thumb">
+            <img src="07_Claude in Chromeでブラウザを自動操作しよう【入門】上級課題０１.png" alt="住宅ローン金利比較表自動生成" />
+          </div>
+          <div class="card-body">
+            <span class="card-badge">Browser Automation</span>
+            <h3 class="card-title">住宅ローン金利比較表 自動生成</h3>
+            <p class="card-desc">Claude in Chrome を使い複数ニュースサイトから住宅ローン金利情報を自動収集・一覧表化。RPAとAI判断を組み合わせた自動化の実践。</p>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- フッター -->
+  <footer>
+    <p>&copy; 2026 AI Works Portfolio</p>
+    <span class="footer-badge">Built with Claude</span>
+  </footer>
+
+  <script>
+    // IntersectionObserver でカード入場アニメーション
+    const cards = document.querySelectorAll('.card');
+    const obs = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          obs.unobserve(e.target);
+        }
+      });
+    }, { threshold: 0.12 });
+    cards.forEach(c => obs.observe(c));
+  </script>
+</body>
+</html>
