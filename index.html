@@ -8,6 +8,7 @@
   <meta property="og:title" content="AI Works Portfolio" />
   <meta property="og:description" content="AIで、アイデアを動くものに変える。" />
   <meta property="og:type" content="website" />
+  <meta property="og:image" content="課題１スクショ.jpg" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&display=swap" rel="stylesheet" />
@@ -315,6 +316,47 @@
     .card:nth-child(4) { transition-delay: .26s; }
     .card:nth-child(5) { transition-delay: .33s; }
 
+    /* ── ハンバーガーメニュー ── */
+    .nav-hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      padding: 4px;
+      background: none;
+      border: none;
+    }
+    .nav-hamburger span {
+      display: block;
+      width: 22px;
+      height: 2px;
+      background: var(--text-inv);
+      transition: background .2s;
+    }
+    .nav-hamburger:hover span { background: var(--gold); }
+    .nav-drawer {
+      display: none;
+      position: fixed;
+      top: 56px; left: 0; right: 0;
+      background: var(--bg-black);
+      border-bottom: 3px solid var(--crimson);
+      z-index: 199;
+      padding: 16px 20px;
+    }
+    .nav-drawer.open { display: block; }
+    .nav-drawer a {
+      display: block;
+      color: var(--text-inv);
+      text-decoration: none;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: .12em;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+    .nav-drawer a:last-child { border-bottom: none; }
+    .nav-drawer a:hover { color: var(--gold); }
+
     /* ── レスポンシブ ── */
     @media (max-width: 960px) {
       .works-grid { grid-template-columns: repeat(2, 1fr); }
@@ -322,6 +364,7 @@
     @media (max-width: 640px) {
       nav { padding: 0 20px; height: 56px; }
       nav ul { display: none; }
+      .nav-hamburger { display: flex; }
       #hero { padding: 64px 20px 72px; }
       .section-inner { padding: 56px 20px; }
       .works-grid { grid-template-columns: 1fr; }
@@ -338,7 +381,14 @@
       <li><a href="#about">About</a></li>
       <li><a href="#works">Works</a></li>
     </ul>
+    <button class="nav-hamburger" id="hamburger" aria-label="メニュー">
+      <span></span><span></span><span></span>
+    </button>
   </nav>
+  <div class="nav-drawer" id="drawer">
+    <a href="#about" onclick="closeDrawer()">About</a>
+    <a href="#works" onclick="closeDrawer()">Works</a>
+  </div>
 
   <!-- ヒーロー -->
   <section id="hero">
@@ -387,7 +437,7 @@
           <div class="card-body">
             <span class="card-badge">Web Game</span>
             <h3 class="card-title">Tetris Neon Edition</h3>
-            <p class="card-desc">AIとのペアプログラミングで制作したブラウザ動作のテトリス。ホールド・ネクスト表示・スコアシステムを完備したネオンデザイン。</p>
+            <p class="card-desc">AIとのペアプログラミングで制作したブラウザ動作のテトリス。ホールド・ネクスト表示・スコアシステムを完備。</p>
           </div>
         </article>
 
@@ -398,7 +448,7 @@
           <div class="card-body">
             <span class="card-badge">Landing Page</span>
             <h3 class="card-title">LINE公式アカウント LP</h3>
-            <p class="card-desc">Manus を使って制作したホットコア向けランディングページ。友だち追加の導線と無料クーポン訴求をデザインに落とし込んだ。</p>
+            <p class="card-desc">Manus を使って制作したホットコア向けランディングページ。友だち追加の導線と無料クーポン訴求を実装。</p>
           </div>
         </article>
 
@@ -409,7 +459,7 @@
           <div class="card-body">
             <span class="card-badge">LINE Bot</span>
             <h3 class="card-title">wakofukaNews Bot</h3>
-            <p class="card-desc">Yahoo!ニュースの最新5件を自動取得してLINEに配信するBotを構築。定時配信により情報収集を完全自動化した。</p>
+            <p class="card-desc">Yahoo!ニュースの最新5件を自動取得してLINEに配信するBotを構築。定時配信により情報収集を自動化。</p>
           </div>
         </article>
 
@@ -431,7 +481,7 @@
           <div class="card-body">
             <span class="card-badge">Browser Automation</span>
             <h3 class="card-title">住宅ローン金利比較表 自動生成</h3>
-            <p class="card-desc">Claude in Chrome を使い複数ニュースサイトから住宅ローン金利情報を自動収集・一覧表化。RPAとAI判断を組み合わせた自動化の実践。</p>
+            <p class="card-desc">Claude in Chrome を使い複数サイトから金利情報を自動収集・一覧表化。RPAとAI判断を組み合わせた自動化の実践。</p>
           </div>
         </article>
 
@@ -457,6 +507,12 @@
       });
     }, { threshold: 0.12 });
     cards.forEach(c => obs.observe(c));
+
+    // ハンバーガーメニュー
+    const hamburger = document.getElementById('hamburger');
+    const drawer = document.getElementById('drawer');
+    hamburger.addEventListener('click', () => drawer.classList.toggle('open'));
+    function closeDrawer() { drawer.classList.remove('open'); }
   </script>
 </body>
 </html>
