@@ -8,16 +8,17 @@
   <meta property="og:title" content="AI Works Portfolio" />
   <meta property="og:description" content="AIで、アイデアを動くものに変える。" />
   <meta property="og:type" content="website" />
+  <!-- セキュリティ: og:image は OGP クローラーが要求する絶対URLで指定すること（本番デプロイ時に更新）-->
   <meta property="og:image" content="課題１スクショ.jpg" />
-  <!-- セキュリティ: CSP でインラインスクリプト以外の外部リソースを制限 -->
+  <!-- セキュリティ: type="module" スクリプトに 'unsafe-inline' は効かないため script-src は 'self' のみ -->
   <meta http-equiv="Content-Security-Policy"
-        content="default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; script-src 'self' 'unsafe-inline';" />
-  <!-- X-Frame-Options の代替（meta は参考値。本番は HTTPヘッダで設定） -->
-  <meta http-equiv="X-Content-Type-Options" content="nosniff" />
-  <!-- パフォーマンス: フォントを preload して FOIT を防ぐ -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
+        content="default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; script-src 'self';" />
+  <!-- セキュリティ: X-Content-Type-Options は HTTP レスポンスヘッダでのみ機能する（meta タグは無効）。本番サーバー側で設定すること -->
+  <!-- パフォーマンス: preconnect でフォント接続レイテンシを低減。font-display=swap は URL パラメータ display=swap で指定済み -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&display=swap&font-display=swap" rel="stylesheet" />
+  <!-- セキュリティ: Google Fonts はレスポンスが動的生成のため SRI 付与不可。本番環境ではフォントを self-host 推奨 -->
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@400;700&display=swap" rel="stylesheet" crossorigin="anonymous" />
   <style>
     /* ============================================================
        男塾デザイン訓令書 準拠
@@ -38,7 +39,9 @@
 
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
-    html { scroll-behavior: smooth; }
+    @media (prefers-reduced-motion: no-preference) {
+      html { scroll-behavior: smooth; }
+    }
 
     body {
       font-family: "游明朝", "Yu Mincho", "Noto Serif JP", serif;
@@ -77,6 +80,11 @@
       transition: color .2s;
     }
     nav ul a:hover { color: var(--gold); }
+    nav ul a:focus-visible {
+      outline: 2px solid var(--gold);
+      outline-offset: 3px;
+      border-radius: 2px;
+    }
 
     /* ── ヒーロー ── */
     #hero {
@@ -135,6 +143,10 @@
     .btn-primary:hover {
       background: var(--crimson-dk);
       box-shadow: rgba(139,0,0,.5) 0 6px 20px;
+    }
+    .btn-primary:focus-visible {
+      outline: 2px solid var(--gold);
+      outline-offset: 3px;
     }
 
     /* ── セクション共通 ── */
@@ -309,7 +321,7 @@
     /* ── スクロールアニメーション ── */
     @keyframes strikein {
       from { transform: scaleX(0); transform-origin: left; }
-      to   { transform: scaleX(1); transform-origin: left; }
+      to   { transform: scaleX(1); }
     }
     .s-rule.animate, .hero-rule.animate {
       animation: strikein .35s ease forwards;
@@ -321,6 +333,15 @@
     .card:nth-child(3) { transition-delay: .19s; }
     .card:nth-child(4) { transition-delay: .26s; }
     .card:nth-child(5) { transition-delay: .33s; }
+
+    /* アクセシビリティ: モーション抑制設定ではカードを即時表示 */
+    @media (prefers-reduced-motion: reduce) {
+      .card {
+        opacity: 1;
+        transform: none;
+        transition: none;
+      }
+    }
 
     /* ── ハンバーガーメニュー ── */
     .nav-hamburger {
@@ -362,6 +383,11 @@
     }
     .nav-drawer a:last-child { border-bottom: none; }
     .nav-drawer a:hover { color: var(--gold); }
+    .nav-drawer a:focus-visible {
+      outline: 2px solid var(--gold);
+      outline-offset: 3px;
+      border-radius: 2px;
+    }
 
     /* ── レスポンシブ ── */
     @media (max-width: 960px) {
@@ -381,27 +407,27 @@
 <body>
 
   <!-- ナビゲーション -->
-  <nav>
+  <nav aria-label="メインナビゲーション">
     <span class="nav-logo">AI　WORKS</span>
     <ul>
       <li><a href="#about">About</a></li>
       <li><a href="#works">Works</a></li>
     </ul>
-    <button class="nav-hamburger" id="hamburger" aria-label="メニュー">
-      <span></span><span></span><span></span>
+    <button class="nav-hamburger" id="hamburger" aria-label="メニューを開く" aria-expanded="false" aria-controls="drawer">
+      <span aria-hidden="true"></span><span aria-hidden="true"></span><span aria-hidden="true"></span>
     </button>
   </nav>
-  <!-- セキュリティ: onclick インラインハンドラを排除。JS側でaddEventListenerを使用 -->
-  <div class="nav-drawer" id="drawer" role="navigation" aria-label="モバイルメニュー">
+  <!-- アクセシビリティ: nav 要素として aria-label で区別。閉じている間は aria-hidden で AT から隠す -->
+  <nav class="nav-drawer" id="drawer" aria-label="モバイルナビゲーション" aria-hidden="true">
     <a href="#about" data-drawer-close>About</a>
     <a href="#works" data-drawer-close>Works</a>
-  </div>
+  </nav>
 
   <!-- ヒーロー -->
-  <section id="hero">
+  <section id="hero" aria-labelledby="hero-heading">
     <div class="hero-inner">
       <p class="hero-eyebrow">AI Development Portfolio</p>
-      <h1>AIで、アイデアを<br><em>動くものに変える</em></h1>
+      <h1 id="hero-heading">AIで、アイデアを<br><em>動くものに変える</em></h1>
       <div class="hero-rule"></div>
       <p>Claude・Manus・LINE API などのAIツールを活用し、<br>
          ゲーム・自動化・アプリ・Webサイトを実際に作った成果物の記録である。</p>
@@ -440,8 +466,8 @@
         <article class="card">
           <div class="card-thumb">
             <!-- パフォーマンス: 1枚目はビューポート内に入りうるため eager + fetchpriority high -->
-            <img src="課題１スクショ.jpg" alt="Tetris Neon Edition"
-                 width="800" height="500" loading="eager" decoding="async" fetchpriority="high" />
+            <img src="課題１スクショ.jpg" alt="Tetris Neon Edition のゲーム画面スクリーンショット"
+                 width="800" height="500" loading="eager" decoding="sync" fetchpriority="high" />
           </div>
           <div class="card-body">
             <span class="card-badge">Web Game</span>
@@ -452,7 +478,7 @@
 
         <article class="card">
           <div class="card-thumb">
-            <img src="課題２スクショ.jpg" alt="LINE公式アカウントLP"
+            <img src="課題２スクショ.jpg" alt="LINE公式アカウント LP のランディングページスクリーンショット"
                  width="800" height="500" loading="lazy" decoding="async" />
           </div>
           <div class="card-body">
@@ -464,7 +490,7 @@
 
         <article class="card">
           <div class="card-thumb">
-            <img class="mobile" src="課題３Screenshot_20260513-062140.png" alt="wakofukaNews Bot"
+            <img class="mobile" src="課題３Screenshot_20260513-062140.png" alt="wakofukaNews Bot の LINE チャット画面スクリーンショット"
                  width="400" height="622" loading="lazy" decoding="async" />
           </div>
           <div class="card-body">
@@ -476,7 +502,7 @@
 
         <article class="card">
           <div class="card-thumb">
-            <img class="mobile" src="課題４Screenshot_20260515-061649.png" alt="ポモドーロタイマー"
+            <img class="mobile" src="課題４Screenshot_20260515-061649.png" alt="ポモドーロタイマーのモバイルアプリ画面スクリーンショット"
                  width="400" height="890" loading="lazy" decoding="async" />
           </div>
           <div class="card-body">
@@ -488,7 +514,7 @@
 
         <article class="card">
           <div class="card-thumb">
-            <img src="07_Claude in Chromeでブラウザを自動操作しよう【入門】上級課題０１.png" alt="住宅ローン金利比較表自動生成"
+            <img src="07_Claude in Chromeでブラウザを自動操作しよう【入門】上級課題０１.png" alt="住宅ローン金利比較表を自動生成したブラウザ操作のスクリーンショット"
                  width="800" height="500" loading="lazy" decoding="async" />
           </div>
           <div class="card-body">
@@ -503,7 +529,7 @@
   </section>
 
   <!-- フッター -->
-  <footer>
+  <footer aria-label="サイト情報">
     <p>&copy; 2026 AI Works Portfolio</p>
     <span class="footer-badge">Built with Claude</span>
   </footer>
@@ -522,6 +548,12 @@
      * @returns {void}
      */
     function initCardReveal(cardElements) {
+      // IntersectionObserver 非対応ブラウザでは全カードを即時表示
+      if (!('IntersectionObserver' in window)) {
+        cardElements.forEach((card) => card.classList.add('visible'));
+        return;
+      }
+
       /** @type {IntersectionObserverCallback} */
       const onIntersect = (entries, observer) => {
         entries.forEach((entry) => {
@@ -544,9 +576,19 @@
      */
     function initMobileNav(toggleButton, drawerElement) {
       /** @returns {void} */
-      const openDrawer  = () => drawerElement.classList.add('open');
+      const openDrawer  = () => {
+        drawerElement.classList.add('open');
+        drawerElement.setAttribute('aria-hidden', 'false');
+        toggleButton.setAttribute('aria-expanded', 'true');
+        toggleButton.setAttribute('aria-label', 'メニューを閉じる');
+      };
       /** @returns {void} */
-      const closeDrawer = () => drawerElement.classList.remove('open');
+      const closeDrawer = () => {
+        drawerElement.classList.remove('open');
+        drawerElement.setAttribute('aria-hidden', 'true');
+        toggleButton.setAttribute('aria-expanded', 'false');
+        toggleButton.setAttribute('aria-label', 'メニューを開く');
+      };
       /** @returns {void} */
       const toggleDrawer = () =>
         drawerElement.classList.contains('open') ? closeDrawer() : openDrawer();
@@ -567,10 +609,28 @@
       });
     }
 
+    /**
+     * 画像読み込み失敗時にプレースホルダーを表示する
+     * @param {NodeListOf<HTMLImageElement>} imgElements
+     * @returns {void}
+     */
+    function initImageFallback(imgElements) {
+      imgElements.forEach((img) => {
+        img.addEventListener('error', () => {
+          img.style.background = 'var(--bg-black)';
+          img.alt = `${img.alt}（画像を読み込めませんでした）`;
+        });
+      });
+    }
+
     /** エントリーポイント */
     function main() {
       const cards = document.querySelectorAll('.card');
       initCardReveal(cards);
+
+      /** @type {NodeListOf<HTMLImageElement>} */
+      const imgs = /** @type {NodeListOf<HTMLImageElement>} */ (document.querySelectorAll('.card-thumb img'));
+      initImageFallback(imgs);
 
       /** @type {HTMLElement | null} */
       const hamburgerEl = document.getElementById('hamburger');
