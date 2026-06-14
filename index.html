@@ -578,7 +578,11 @@
       /** @returns {void} */
       const openDrawer  = () => {
         drawerElement.classList.add('open');
+<<<<<<< HEAD
         drawerElement.removeAttribute('aria-hidden');
+=======
+        drawerElement.setAttribute('aria-hidden', 'false');
+>>>>>>> origin/master
         toggleButton.setAttribute('aria-expanded', 'true');
         toggleButton.setAttribute('aria-label', 'メニューを閉じる');
       };
@@ -618,6 +622,10 @@
       imgElements.forEach((img) => {
         img.addEventListener('error', () => {
           img.style.background = 'var(--bg-black)';
+<<<<<<< HEAD
+=======
+          img.alt = `${img.alt}（画像を読み込めませんでした）`;
+>>>>>>> origin/master
         });
       });
     }
@@ -628,7 +636,11 @@
       initCardReveal(cards);
 
       /** @type {NodeListOf<HTMLImageElement>} */
+<<<<<<< HEAD
       const imgs = document.querySelectorAll('.card-thumb img');
+=======
+      const imgs = /** @type {NodeListOf<HTMLImageElement>} */ (document.querySelectorAll('.card-thumb img'));
+>>>>>>> origin/master
       initImageFallback(imgs);
 
       /** @type {HTMLElement | null} */
