@@ -12,7 +12,7 @@
   <meta property="og:image" content="課題１スクショ.jpg" />
   <!-- セキュリティ: type="module" スクリプトに 'unsafe-inline' は効かないため script-src は 'self' のみ -->
   <meta http-equiv="Content-Security-Policy"
-        content="default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; script-src 'self';" />
+        content="default-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self'; script-src 'self';" />
   <!-- セキュリティ: X-Content-Type-Options は HTTP レスポンスヘッダでのみ機能する（meta タグは無効）。本番サーバー側で設定すること -->
   <!-- パフォーマンス: preconnect でフォント接続レイテンシを低減。font-display=swap は URL パラメータ display=swap で指定済み -->
   <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
@@ -578,7 +578,7 @@
       /** @returns {void} */
       const openDrawer  = () => {
         drawerElement.classList.add('open');
-        drawerElement.setAttribute('aria-hidden', 'false');
+        drawerElement.removeAttribute('aria-hidden');
         toggleButton.setAttribute('aria-expanded', 'true');
         toggleButton.setAttribute('aria-label', 'メニューを閉じる');
       };
@@ -618,7 +618,6 @@
       imgElements.forEach((img) => {
         img.addEventListener('error', () => {
           img.style.background = 'var(--bg-black)';
-          img.alt = `${img.alt}（画像を読み込めませんでした）`;
         });
       });
     }
@@ -629,7 +628,7 @@
       initCardReveal(cards);
 
       /** @type {NodeListOf<HTMLImageElement>} */
-      const imgs = /** @type {NodeListOf<HTMLImageElement>} */ (document.querySelectorAll('.card-thumb img'));
+      const imgs = document.querySelectorAll('.card-thumb img');
       initImageFallback(imgs);
 
       /** @type {HTMLElement | null} */
